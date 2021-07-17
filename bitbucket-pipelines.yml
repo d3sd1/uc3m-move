@@ -1,0 +1,23 @@
+# This is a sample build configuration for Java (Maven).
+# Check our guides at https://confluence.atlassian.com/x/zd-5Mw for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: node:11.15
+
+pipelines:
+  branches:
+    master:
+      - step:
+          deployment: prod
+          name: Manual deploy to PROD
+          script:
+            - "ssh $SFTP_USER@$SFTP_HOST mkdir -p /var/www/uc3move.live"
+            - "ssh $SFTP_USER@$SFTP_HOST rm -rf /var/www/uc3move.live/*"
+            - pipe: atlassian/sftp-deploy:0.5.2
+              variables:
+                USER: $SFTP_USER
+                SERVER: $SFTP_HOST
+                REMOTE_PATH: "/var/www/uc3move.live"
+                LOCAL_PATH: './*'
+                DEBUG: 'true'
